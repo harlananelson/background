@@ -1,0 +1,154 @@
+---
+title: "Homework #1: Data Manipulation & Analysis using R"
+output: html_notebook
+---
+## First load needed libraries
+```{r,echo=FALSE,results='hide'}
+library(Hmisc)
+library(data.table)
+library(tidyverse)
+```
+
+## This data is about a particular area with variables 
+
+1. YEAR
+: Year 1947 - 1962
+
+2. PGNP
+: GNP Deflator 1954=100
+
+3. GNP
+: Gross National Product in $1,000,000
+
+4. UEM
+: Unemployed in thousands
+
+5. AF 
+: Armed Forces in thousands
+
+6. POP 
+: Population in thousands
+
+7. EM 
+: Employed in thousands
+
+Exercises:
+
+1. Download this file from the internet link http://web.pdx.edu/~crkl/ceR/data/longley.txt and show the file as an object in R. Examine the link before you get this into R. (do not forget to use header = T, nrows=16 in the end of the link). You may want to call this data as “data”.
+
+```{r}
+d<-readr::read_table("http://web.pdx.edu/~crkl/ceR/data/longley.txt",n_max=16)
+```
+Assign variable labels.
+```{r,eval=FALSE}
+names(d)
+var.labels <- c(
+  YEAR = "Year 1947 - 1962", 
+  PGNP = "GNP Deflator 1954=100", 
+  GNP  = "Gross National Product in $1,000,000", 
+  UEM  = "Unemployed in thousands", 
+  AF   = "Armed Forces in thousands", 
+  POP  = "Population in thousands", 
+  EM   = "Employed in thousands"
+)
+Hmisc::upData(d,labels=var.labels)
+```
+3. Create a new dataset “data1” by Deleting or Replacing the variable “YEAR” with “STATES” and list them as NJ for the first 5 rows, NY for second 5 rows and PA for third 6 rows.
+
+```{r}
+STATES <- unlist(purrr::map2(c("NJ","NY","PA"),c(5,5,6),rep))
+print(STATES)
+d$STATES <- STATES
+head(d)
+```
+4. Add another variable “CITY” with a name of a place that you are familiar with e.g., Edison with each row having a different city name.
+```{r}
+NJ<-c('Jersey City','Paterson','Trenton','Newark','Edison')
+NY<-c('New York','Brooklyn','Manhattan','Albany','Queens')
+PA<-c('Pennsylvania','Philadelphia','Pittsburgh','Allentown','Bethlehem','Easton')
+d['CITY'] <- c(NJ,NY,PA)
+head(d)
+```
+
+5. What is the minimum number of employed and average number of employed overall?
+```{r}
+sum_EM <- d %>% summarise(min = min(EM),mean =  mean(EM), max = max(EM))
+sum_EM   
+```
+
+The minimum number unemployed is `r format(sum_EM[['min']])` thousand for any one city.
+
+6. Which STATES has minimum unemployed and maximum unemployed?
+```{r}
+names(d)
+EM_min <- d %>% filter(.data$EM == sum_EM[['min']] ) %>%
+  select(EM,STATES)
+EM_max <- d %>% filter(.data$EM == sum_EM[['max']] ) %>%
+  select(EM,STATES)
+print(EM_min)
+print(EM_max)
+```
+The STATES with the minimum unemployment is `r EM_min[['STATES']]`.
+The STATES with the maximum unemploymed is `r EM_max[['STATES']]`.
+
+7. Which CITY has min GNP and the max GNP. What else do you observe? Which city you suggest if someone is planning to relocate for good? 
+```{r}
+sum_GNP <- d %>% summarise(min = min(GNP),mean =  mean(GNP), max = max(GNP))
+d7<-d %>% filter(.data$GNP == sum_GNP[['min']] |  .data$GNP == sum_GNP[['max']])
+print(d7)
+```
+I would relocate to the city ```r d7$CITY[2]```
+
+8. Create a box plot by plotting AF on State. What is your understanding from the box plot. You will need to give your understanding from the box plot clearly.
+
+```{r}
+d %>% ggplot() +
+  aes(x=STATES,AF) + 
+  geom_boxplot()
+```
+
+
+
+9. Create a new dataset “data1” which has the following variables STATE, UEM, EM, POP.
+```{r}
+data1 <- d %>% select(STATES,UEM,EM,POP)
+head(data1)
+```
+10. Create and add a new variable “diff” which is the difference of POP and EM.
+```{r}
+data1 <- data1 %>% mutate(diff = POP - EM)
+head(data1,n = 7)
+```
+11. Show using scripts as to what you see in the row 7 and column 5.
+
+```{r}
+data1[c(7),c(5)]
+```
+12. Create a pie chart based on all the three states for UEM and comment about it.
+
+```{r}
+bp<- ggplot(data1, aes(x="", y=UEM, fill=STATES))+
+geom_bar(width = 1, stat = "identity")
+bp
+pie <- bp + coord_polar("y", start=0)
+pie
+```
+
+13. Create and show histograms for UN, UEM and POP and comment about your understanding. 
+```{r}
+names(d)
+d %>% ggplot() +
+  aes(x=UEM) + 
+  geom_density()
+```
+```{r}
+d %>% ggplot() +
+  aes(x=POP) + 
+  geom_density()
+```
+
+
+
+
+
+
