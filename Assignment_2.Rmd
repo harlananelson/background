@@ -1,0 +1,135 @@
+---
+title: "Background Module Requirements"
+output: html_notebook
+---
+
+# Compitencies
+This document list competencies taught in the Background module
+
+
+## Assignment 1
+* Use R to read a data set from the web
+* Use dplyr to create new variables, select variables, and observations.
+* Use dplyr to summarize data.
+* Use ggplot to plot data
+* Use the functional programming of apply, lapply, sapply, tapply and dplyr::purrr.
+
+## Maximum Likelihood.
+* Use the principle of maximum likelihood to compare data to hypothesis. 
+* Estimate population parameters for continuous and discrete distribution. 
+
+## Flip of a coin
+
+Outcome   | Probability
+----------|------------
+Heads     | 0.5
+Tails     | 0.5
+
+
+Data | Encoding
+-----|--------
+Heads| 1
+
+```{r}
+likelyhood <- function(heads){
+  heads * 0.5 
+}
+likelyhood(1)
+```
+Data | Encoding | Prob
+-----|----------|-----
+Heads| 1        |  0.5
+Tails| 0        |  0.5
+```{r}
+# heads
+p1 <- 0.5
+# tails
+p2 <- 0.5
+# Likelihood
+p1 * p2
+```
+Try to find a larger likelihood. This is impossible
+Data | Encoding | Prob
+-----|----------|-----
+Heads| 1        |  0.4
+Tails| 0        |  0.6
+```{r}
+# heads
+p1 <- 0.4
+# tails
+p2 <- 0.6
+# Likelihood
+p1 * p2
+```
+Lets look over a grid of values to find a better probability for heads.
+First set up a grid of probabilities
+```{r}
+head_prob <-seq(0,1,0.01)
+tail_prob <- 1 - head_prob
+tail_prob
+```
+Now check the likelihood at one point on the grid.  
+```{r}
+#count the number of heads and the number of tails: one head , one tail
+x <-c(1,1)
+x[1] * head_prob[1]
+x[2] * tail_prob[1]
+x[1] * head_prob[1] * x[2] * tail_prob[1]
+```
+Create a function to do an elementary calculation, so more values can be tested.
+Notice the individual probabilities are multiplied together.
+```{r}
+like <- function(x,p_selection){
+   (head_prob[p_selection])^x[1] * tail_prob[p_selection]^x[2] 
+}
+like(c(1,1),1)
+like(c(1,1),2)
+like(c(1,1),3)
+```
+Use functional programming to make testing automatic
+```{r}
+lapply(1:100,like,x=c(1,1))
+```
+
+Consider a different data set with two head but no tails.
+Try to find a larger likelihood. This is impossible
+
+Data | Count    | Prob  | Encoding
+-----|----------|-------|---------
+Heads| 2        |  ?    | 2 
+Tails| 0        |  ?    | 0
+
+Lets guess that the probability of tails is close to zero.  Notice that tails never occurs
+```{r}
+# Encode the data with counts of heads and counts of tails
+x <- c( 2,0)
+lapply(1:100,like,x=x)
+```
+
+
+Try a different data set.
+
+Data | Count    | Prob  | Encoding
+-----|----------|-------|---------
+Heads| 10        |  ?    | 10
+Tails| 20        |  ?    | 20
+
+There are twice as many tails as heads, so guess that the probability to tails is twice the probability of heads.
+```{r}
+x <- c( 10,20)
+lapply(1:100,like,x=x)
+```
+
+Here is the maximum likelihood probabilities for heads and tails.
+```{r}
+head_prob[34]
+tail_prob[34]
+```
+Exercise:
+Replicate this for a three sided dice, then a six sided dice, then for the normal distribution
+See ?pnorm.
+
+
+
+
+
