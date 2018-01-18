@@ -137,9 +137,9 @@ pie
 13. Create and show histograms for UN, UEM and POP and comment about your understanding. 
 ```{r}
 names(d)
-d %>% ggplot() +
+d %>% ggplot() + 
   aes(x=UEM) + 
-  geom_density()
+  geom_bar(width = 1)
 ```
 ```{r}
 d %>% ggplot() +
