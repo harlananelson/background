@@ -4,8 +4,8 @@ output: html_notebook
 ---
 
 # Compitencies
-This document list competencies taught in the Background module
-
+Here is a review of competencies from the previous module as well as
+what is to be understood in this current module.
 
 ## Assignment 1
 * Use R to read a data set from the web
@@ -18,6 +18,21 @@ This document list competencies taught in the Background module
 * Use the principle of maximum likelihood to compare data to hypothesis. 
 * Estimate population parameters for continuous and discrete distribution. 
 
+Likelihood is calculated from the data and the likelihood function.
+The parameters of the likelihood function can come from 
+a hypothesis about the data.  The hypothesis can quantify
+prior expectation, a guess or even what the researcher is trying to 
+disprove.  
+
+In the case of matching a child with their parents we associate a 
+high probability to children being of the same nationality or 
+ethnic background as the parents.  There is a smaller chance the 
+child is adopted.  But if we have to make a guess, we go with the 
+explaination that has the highest change of occuring.
+
+For our calculations, will will start of with a very simple example and 
+calculate the likelihood.
+
 ## Flip of a coin
 
 Outcome   | Probability
@@ -25,21 +40,21 @@ Outcome   | Probability
 Heads     | 0.5
 Tails     | 0.5
 
-
-Data | Encoding
------|--------
-Heads| 1
-
+Assume there is one toss and a head is thrown.
 ```{r}
-likelyhood <- function(heads){
-  heads * 0.5 
-}
-likelyhood(1)
+1 * 0.5
 ```
+Now consider two events.  In the first event a head is tossed,
+In the second event a tails is tossed.  The probabilities for the 
+two events are multiplied to get the likelihood of the data given the
+proposed probabilities given in the table below.
+
 Data | Encoding | Prob
 -----|----------|-----
 Heads| 1        |  0.5
 Tails| 0        |  0.5
+
+
 ```{r}
 # heads
 p1 <- 0.5
@@ -48,7 +63,10 @@ p2 <- 0.5
 # Likelihood
 p1 * p2
 ```
-Try to find a larger likelihood. This is impossible
+Try to find a larger likelihood by using different probabilities for
+the event of head and the event of tails.  The probabilities have to 
+add up to one. The pobabilities on the table below will be tried.
+
 Data | Encoding | Prob
 -----|----------|-----
 Heads| 1        |  0.4
@@ -59,8 +77,13 @@ p1 <- 0.4
 # tails
 p2 <- 0.6
 # Likelihood
-p1 * p2
+l1 <- p1 * p2
+l1
+
 ```
+The likelyhood of getting one head and one tail if the probability for 
+heads is 0.5 and the probability for tails is 0.5 is `r format(l1)`
+
 Lets look over a grid of values to find a better probability for heads.
 First set up a grid of probabilities
 ```{r}
