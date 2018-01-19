@@ -24,7 +24,7 @@ a hypothesis about the data.  The hypothesis can quantify
 prior expectation, a guess or even what the researcher is trying to 
 disprove.  
 
-In the case of matching a child with their parents we associate a 
+In the case of matching a child with their parents, we associate a 
 high probability to children being of the same nationality or 
 ethnic background as the parents.  There is a smaller chance the 
 child is adopted.  But if we have to make a guess, we go with the 
@@ -45,7 +45,7 @@ Assume there is one toss and a head is thrown.
 1 * 0.5
 ```
 Now consider two events.  In the first event a head is tossed,
-In the second event a tails is tossed.  The probabilities for the 
+In the second event a tail is tossed.  The probabilities for the 
 two events are multiplied to get the likelihood of the data given the
 proposed probabilities given in the table below.
 
@@ -56,14 +56,14 @@ Tails| 0        |  0.5
 
 
 ```{r}
-# heads
+# first toss: heads
 p1 <- 0.5
-# tails
+# second toss: tails
 p2 <- 0.5
 # Likelihood
 p1 * p2
 ```
-Try to find a larger likelihood by using different probabilities for
+Try to find the largest likelihood possible by using different probabilities for
 the event of head and the event of tails.  The probabilities have to 
 add up to one. The pobabilities on the table below will be tried.
 
@@ -82,40 +82,68 @@ l1
 
 ```
 The likelyhood of getting one head and one tail if the probability for 
-heads is 0.5 and the probability for tails is 0.5 is `r format(l1)`
+heads is `r p1`  and the probability for tails is `r p2` is `r format(l1)`
 
 Lets look over a grid of values to find a better probability for heads.
 First set up a grid of probabilities
 ```{r}
-head_prob <-seq(0,1,0.01)
+head_prob <-seq(0,1,0.001)
+head_prob
+
 tail_prob <- 1 - head_prob
 tail_prob
+head_prob
+head_prob[3]
 ```
 Now check the likelihood at one point on the grid.  
 ```{r}
 #count the number of heads and the number of tails: one head , one tail
-x <-c(1,1)
-x[1] * head_prob[1]
-x[2] * tail_prob[1]
-x[1] * head_prob[1] * x[2] * tail_prob[1]
+x <-c("number of heads" = 1, "number of tails" = 1)
+x
+x[1]
+x[2]
+tail_prob[2]
+x[1] * head_prob[2]
+x[2] * tail_prob[2]
+x[1] * head_prob[2] * x[2] * tail_prob[2]
 ```
 Create a function to do an elementary calculation, so more values can be tested.
 Notice the individual probabilities are multiplied together.
 ```{r}
+#lapply is list apply:  Apply a function to a list.
+#sapply simple apply
 like <- function(x,p_selection){
-   (head_prob[p_selection])^x[1] * tail_prob[p_selection]^x[2] 
+  # probability of a head ^ number of times a head is tossed
+  heads_likelihood <-(head_prob[p_selection])^x[1] 
+  tails_likelihood <-(tail_prob[p_selection])^x[2] 
+  result <- c("likelihood is: " = as.double(heads_likelihood * tails_likelihood) )
+  return(result)
 }
-like(c(1,1),1)
-like(c(1,1),2)
-like(c(1,1),3)
+x <- like(c("number of heads" = 1, "number of tails" = 1),1 )
+x
+like(c("number of heads" = 1, "number of tails" = 1),2 )
+like(c("number of heads" = 1, "number of tails" = 1),3 )
+like(c("number of heads" = 1, "number of tails" = 1),51 )
 ```
 Use functional programming to make testing automatic
 ```{r}
-lapply(1:100,like,x=c(1,1))
+observed_data <- c("number of heads" = 1, "number of tails" = 1)
+l <- lapply(1:100,like,x=observed_data)
 ```
+ 
+```{r}
+l
+i <- which(l == max(as.double(l)))
+i
+prob <- head_prob[i]
+prob
+```
+The maximum likelihood estimate for the probability of heads based on 
+a grid search is `r prob`. This is based on observing one head and one tail. 
+
 
 Consider a different data set with two head but no tails.
-Try to find a larger likelihood. This is impossible
+Try to find the largest  likelihood. 
 
 Data | Count    | Prob  | Encoding
 -----|----------|-------|---------
@@ -125,8 +153,12 @@ Tails| 0        |  ?    | 0
 Lets guess that the probability of tails is close to zero.  Notice that tails never occurs
 ```{r}
 # Encode the data with counts of heads and counts of tails
-x <- c( 2,0)
-lapply(1:100,like,x=x)
+observed_data <- c("number of heads" = 2, "number of tails" = 0)
+l <- lapply(1:1000,like,x=observed_data)
+i <- which(l == max(as.double(l)))
+i
+prob <- head_prob[i]
+prob
 ```
 
 
@@ -139,18 +171,33 @@ Tails| 20        |  ?    | 20
 
 There are twice as many tails as heads, so guess that the probability to tails is twice the probability of heads.
 ```{r}
-x <- c( 10,20)
-lapply(1:100,like,x=x)
+# Encode the data with counts of heads and counts of tails
+observed_data <- c("number of heads" = 10, "number of tails" = 50)
+observed_data
+# call the the like function 100 times.  The first time with and index of 1
+# and with x= observered data
+
+lapply(1:100,like,x=observed_data)
+like(26,x=observed_data)
+l <- lapply(1:100,like,x=observed_data)
+l <- sapply(1:1000,like,x=observed_data)
+max(l)
+l
+i <- which(l == max(l))
+i
+head_prob[34]
+prob <- head_prob[i]
+prob
 ```
 
-Here is the maximum likelihood probabilities for heads and tails.
-```{r}
-head_prob[34]
-tail_prob[34]
-```
 Exercise:
 Replicate this for a three sided dice, then a six sided dice, then for the normal distribution
 See ?pnorm.
+
+```{r}
+
+```
+
 
 
 
