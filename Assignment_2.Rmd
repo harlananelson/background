@@ -194,8 +194,72 @@ Exercise:
 Replicate this for a three sided dice, then a six sided dice, then for the normal distribution
 See ?pnorm.
 
-```{r}
 
+Maximum likelihood of the mean
+
+need a way to calculate the normal likelihood give data and a value for the mean.
+
+```{r}
+x <- 4
+# guess a value for the mean that will maximize the likelihood function.
+# given the data.
+# The data is fixed.  The estimate for the mean has to agree with the data.
+# ignore the standar deviagtion.
+x <- c(2,3,3,5,6,8)
+d<-dnorm(x,mean=3)
+prod(d)
+d<-dnorm(x,mean=2)
+prod(d)
+d<-dnorm(x,mean=2.5)
+prod(d)
+d<-dnorm(x,mean=2.6)
+prod(d)
+d<-dnorm(x,mean=4)
+prod(d)
+d<-dnorm(x,mean=4.5)
+prod(d)
+```
+```{r}
+library(ggplot2)
+library(magrittr)
+```
+
+```{r}
+mean=0
+x <-seq(mean - 4,mean + 4,by=.001) 
+y<-dnorm(x,mean=mean)
+d <-data.frame(x=x,y=y)
+d %>% ggplot() + 
+  aes(x=x,y=y) +
+  geom_point() + 
+  geom_line()
+```
+What is hypothesis testing?
+Research question.
+Proof by contradition.
+When there are two possible explainations, accept the one with the higher probability.
+If an explaination is very unlikely, then reject it.
+The data is the random event. 
+What is the probabilty of  the data.  
+
+H0 (null): Eating Bacon every day does not increase cholesterol.
+H1 (alternate) : Eating bacon increases cholesterol.
+
+data: recruit people.  controll the diet for 6 months.  then start the study
+group a: eats bacon every day.
+group b: no bacon.
+
+Calculate the difference for each person.  Before and after. 
+
+Based on the assumption of H0, does the data make sense?
+
+Quantify the difference statistically
+The difference is quantified as area under the normal curve.
+
+
+average difference is 50, sd = 20, 30 people 
+```{r}
+1 - pnorm(10,mean= 0, sd = 20/sqrt(30))
 ```
 
 
